@@ -88,7 +88,7 @@ def plot_percentages(df: pd.DataFrame, outdir: Path):
     plt.savefig(outdir / "sentiment_percentages_bar.png", dpi=150)
     plt.close()
 
-    # Pie chart
+    # Pie charts
     plt.figure(figsize=(5, 5))
     colors = ["#4caf50", "#9e9e9e", "#f44336"]
     plt.pie(pct.values, labels=pct.index, autopct="%1.1f%%", startangle=140, colors=colors)

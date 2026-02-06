@@ -19,7 +19,7 @@ USAGE:
 
 NOTES:
 - The first run will download the model once (then it will be cached locally).
-- If you�re on Windows and Torch install is annoying, you can use:
+- If you�re on Windows and Torch install is annoying, you could use:
     pip install -U transformers torch --index-url https://download.pytorch.org/whl/cpu
 """
 
