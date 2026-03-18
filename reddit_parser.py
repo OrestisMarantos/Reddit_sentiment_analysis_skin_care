@@ -8,6 +8,9 @@ from typing import List, Dict, Any, Optional, Tuple
 # Helpers
 # -----------------------------
 DISALLOWED_USERNAMES = {"Share", "Report", "Award", "Upvote", "Downvote"}
+# Default directory containing .txt thread dumps. Change these constants if your folders differ.
+DEFAULT_INPUT_DIR = Path(__file__).parent / "txt_threads"
+DEFAULT_OUTPUT_DIR = Path(__file__).parent / "parsed_json"
 
 def clean_lines(text: str) -> List[str]:
     lines = [ln.rstrip("\n").rstrip("\r").rstrip() for ln in text.splitlines()]
@@ -284,16 +287,32 @@ def parse_reddit_thread_txt(path: str) -> Dict[str, Any]:
 
 
 def __main__():
-    # change this to your file path
-    input_file = "solid_perfumes_thread.txt"
+    """
+    Parse every *.txt inside DEFAULT_INPUT_DIR and write *.parsed.json into DEFAULT_OUTPUT_DIR.
+    No command-line args needed; adjust the constants at the top if your paths differ.
+    """
+    in_path = DEFAULT_INPUT_DIR
+    out_dir = DEFAULT_OUTPUT_DIR
 
-    data = parse_reddit_thread_txt(input_file)
-    print(f"Title: {data['thread']['title']}")
-    print(f"Comments parsed: {len(data['comments'])}")
+    if not in_path.exists():
+        print(f"Input directory not found: {in_path.resolve()}")
+        return
+    if not in_path.is_dir():
+        print(f"Configured path is not a directory: {in_path.resolve()}")
+        return
 
-    out_path = Path(input_file).with_suffix(".parsed.json")
-    out_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Saved: {out_path}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    txt_files = sorted(in_path.glob("*.txt"))
+    if not txt_files:
+        print(f"No .txt files found in directory: {in_path.resolve()}")
+        return
+
+    for txt in txt_files:
+        data = parse_reddit_thread_txt(txt)
+        out_path = out_dir / f"{txt.stem}.parsed.json"
+        out_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"Parsed {txt.name} -> {out_path.name} (comments: {len(data['comments'])})")
 
 
 if __name__ == "__main__":
