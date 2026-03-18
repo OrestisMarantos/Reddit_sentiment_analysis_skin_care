@@ -12,6 +12,31 @@ DISALLOWED_USERNAMES = {"Share", "Report", "Award", "Upvote", "Downvote"}
 DEFAULT_INPUT_DIR = Path(__file__).parent / "txt_threads"
 DEFAULT_OUTPUT_DIR = Path(__file__).parent / "parsed_json"
 
+def parse_txt_file_to_json(txt_path: str | Path, output_dir: str | Path) -> Path:
+    txt_path = Path(txt_path)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    data = parse_reddit_thread_txt(txt_path)
+    out_path = output_dir / f"{txt_path.stem}.parsed.json"
+    out_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return out_path
+
+
+def parse_folder_to_json(category_folder: str | Path, output_dir: str | Path) -> List[Path]:
+    category_folder = Path(category_folder)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    json_paths = []
+    txt_files = sorted(category_folder.glob("*.txt"))
+
+    for txt_file in txt_files:
+        out_path = parse_txt_file_to_json(txt_file, output_dir)
+        json_paths.append(out_path)
+
+    return json_paths
+
 def clean_lines(text: str) -> List[str]:
     lines = [ln.rstrip("\n").rstrip("\r").rstrip() for ln in text.splitlines()]
     # collapse repeated blanks

@@ -241,6 +241,29 @@ def plot_trend_by_year(df: pd.DataFrame, outdir: Path):
     plt.close()
 
 
+
+def generate_all_plots(csv_path: str | Path, outdir: str | Path) -> list[Path]:
+    csv_path = Path(csv_path)
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    df = load_df(csv_path)
+    if df.empty:
+        raise ValueError(f"No data to plot in {csv_path.name}")
+
+    plot_percentages(df, outdir)
+    plot_votes_by_sentiment(df, outdir)
+    plot_combined(df, outdir)
+    plot_trend_by_year(df, outdir)
+
+    return [
+        outdir / "sentiment_percentages_bar.png",
+        outdir / "sentiment_percentages_pie.png",
+        outdir / "upvotes_downvotes_by_sentiment.png",
+        outdir / "sentiment_combined.png",
+        outdir / "sentiment_trend_by_year.png",
+    ]
+
 def main():
     # Allow running without CLI args (e.g., double-click)
     if len(sys.argv) == 1:
